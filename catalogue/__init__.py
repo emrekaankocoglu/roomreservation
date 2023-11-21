@@ -1,15 +1,18 @@
+from user import User
 class Singleton(object):
   def __new__(cls):
     if not hasattr(cls, 'instance'):
       cls.instance = super(SingletonClass, cls).__new__(cls)
     return cls.instance
 
+    
 class Catalogue(Singleton):
     def __init__(self):
         self.id_counter = 0
         self.rooms = {}
         self.events = {}
         self.organizations = {}
+        self.user = None
     
     def registerRoom(self, room):
         self.id_counter += 1
@@ -35,7 +38,12 @@ class Catalogue(Singleton):
         }
         self.organizations.update(organization_dict)
         return self.id_counter
-
-
-
+    
+    def registerUser(self, user):
+        self.user = user
+        return self.user
+    def switchuser(self, user):
+        self.user = user 
+        return self.user
+    
     
