@@ -16,10 +16,10 @@ class Event:
         self.location = None
     
     @staticmethod
-    def create(title:str, description:str, category:str, capacity:int, duration:datetime.timedelta, start:datetime.datetime, weekly:datetime.date, permissions:dict):
-        event = Event(title, description, category, capacity, duration, start, weekly, permissions)
+    def create(title:str, description:str, category:str, capacity:int, duration:datetime.timedelta, weekly:datetime.date, permissions:dict):
+        event = Event(title, description, category, capacity, duration, weekly, permissions)
         event.id = Catalogue().registerEvent(event)
-        return
+        return event
     @staticmethod
     def get(id:int):
         return Catalogue().events[id]
