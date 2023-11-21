@@ -13,7 +13,7 @@ class Organization:
     def create(name:str, rooms:[Room], events:[Event]):
         organization = Organization(name, rooms, events)
         organization.id = Catalogue().registerOrganization(organization)
-        return
+        return organization
     
     @staticmethod
     def get(id:int):

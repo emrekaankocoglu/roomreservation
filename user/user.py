@@ -6,5 +6,8 @@ class User:
         self.fullname = fullname
         self.passwd = passwd
 
+    def createUser(username:str, mail:str, fullname:str, passwd:str):
+        user = User(username,mail,fullname,passwd)
+        return user
     def get_user_details(self):
         return f"Username: {self.username}, Name: {self.fullname}, Mail: {self.mail}, Password: {self.passwd}"

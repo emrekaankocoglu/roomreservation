@@ -1,4 +1,4 @@
-from user import User
+from user.user import User
 class Singleton(object):
   def __new__(cls):
     if not hasattr(cls, 'instance'):
@@ -17,24 +17,24 @@ class Catalogue(Singleton):
     def registerRoom(self, room):
         self.id_counter += 1
         room_dict = {
-            id : self.id_counter,
-            room : room
+            "id" : self.id_counter,
+            "room" : room
         }
         self.rooms.update(room_dict)
         return self.id_counter
     def registerEvent(self, event):
         self.id_counter += 1
         event_dict = {
-            id : self.id_counter,
-            event : event
+            "id" : self.id_counter,
+            "event" : event
         }
         self.events.update(event_dict)
         return self.id_counter
     def registerOrganization(self, organization):
         self.id_counter += 1
         organization_dict = {
-            id : self.id_counter,
-            organization : organization
+            "id" : self.id_counter,
+            "organization" : organization
         }
         self.organizations.update(organization_dict)
         return self.id_counter
