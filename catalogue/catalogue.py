@@ -4,9 +4,17 @@ class Singleton(object):
     if not hasattr(cls, 'instance'):
       cls.instance = super(Singleton, cls).__new__(cls)
     return cls.instance
+  
+def singleton(cls):
+   _instances = {}
+   def getinstance():
+        if cls not in _instances:
+            _instances[cls] = cls() 
+            return _instances[cls]
+   return getinstance
 
-    
-class Catalogue(Singleton):
+@singleton   
+class Catalogue:
     def __init__(self):
         self.id_counter = 0
         self.rooms = {}
