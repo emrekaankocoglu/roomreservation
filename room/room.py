@@ -23,7 +23,7 @@ class Room:
     
     @staticmethod
     def retrieve(id:int):
-        return get(id)
+        return Room.get(id)
     
     @staticmethod
     def delete(id:int):

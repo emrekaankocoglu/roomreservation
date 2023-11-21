@@ -19,12 +19,18 @@ class Query:
         for room in self.rooms:
             if not Query.in_rectangle(room.x, room.y, self.filter['rectangle']):
                 continue
+            collision = False
             for event in self.event:
                 if event.location is None or event.location != room.id:
                     continue
                 for period in event.getTimePeriod():
                     if Query.collide(period, (self.filter['start'], self.filter['end'])):
+                        collision = True
                         break
+            if not collision:
+                yield room
+        return
+                
 
 
 

@@ -1,4 +1,5 @@
-from catalogue import Catalogue
+from catalogue.catalogue import Catalogue
+from room.room import Room
 import datetime
 
 class Event:
@@ -24,7 +25,7 @@ class Event:
         return Catalogue().events[id]
     @staticmethod
     def retrieve(id:int):
-        return get(id)
+        return Event.get(id)
     @staticmethod
     def delete(id:int):
         del Catalogue().events[id]
@@ -34,9 +35,21 @@ class Event:
         event = Event(title, description, category, capacity, duration, start, weekly, permissions)
         Catalogue().events[id] = event
         return
-    def assignPeriod(self, start:datetime.datetime, location:id):
+    def assignPeriod(self, start:datetime.datetime, location:Room):
+        eventperms = self.permissions.get(Catalogue().getUser().id)
+        if eventperms is None:
+            raise Exception("User does not have permission to assign event")
+        roomperms = Room.permissions.get(Catalogue().getUser().id)
+        if roomperms is None:
+            raise Exception("User does not have permission to assign room")
+        if self.weekly and "PERWRITE" not in roomperms:
+            raise Exception("User does not have permission to assign weekly event for room")
+        elif "WRITE" not in roomperms:
+            raise Exception("User does not have permission to assign event for room")
+        
+        
         self.start = start
-        self.location = location
+        self.location = location.id
         return
     def getTimePeriod(self):
         start = self.start
@@ -44,7 +57,7 @@ class Event:
             return (self.start, self.start+self.duration)
         else:
             start =+ datetime.timedelta(weeks=1)
-            if start > weekly:
+            if start > self.weekly:
                 return
             yield (start, start+self.duration)
         

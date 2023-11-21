@@ -1,14 +1,16 @@
 from room.room import Room
-from event.event import event
+from event.event import Event
+from catalogue.catalogue import Catalogue
+import datetime
 class Organization:
-    def __init__(self, name:str, rooms:[Room], events:[event]):
+    def __init__(self, name:str, rooms:[Room], events:[Event]):
         self.id = -1
         self.name = name
         self.rooms = rooms
         self.events = events
     
     @staticmethod
-    def create(name:str, rooms:[Room], events:[event]):
+    def create(name:str, rooms:[Room], events:[Event]):
         organization = Organization(name, rooms, events)
         organization.id = Catalogue().registerOrganization(organization)
         return
@@ -19,7 +21,7 @@ class Organization:
     
     @staticmethod
     def retrieve(id:int):
-        return get(id)
+        return Organization.get(id)
     
     @staticmethod
     def delete(id:int):
@@ -27,11 +29,15 @@ class Organization:
         return
     
     @staticmethod
-    def update(id:int, name:str, rooms:[Room], events:[event]):
+    def update(id:int, name:str, rooms:[Room], events:[Event]):
         organization = Organization(name, rooms, events)
         Catalogue().organizations[id] = organization
         return
     
+    def reserve(event:Event, room:Room, start:datetime.datetime):
+        event.assignPeriod(start, room)
+        return
+
     def getRoom(self, id:int):
         return self.rooms[id]
     def updateRoom(self, id:int, room:Room):

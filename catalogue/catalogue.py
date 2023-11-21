@@ -2,7 +2,7 @@ from user import User
 class Singleton(object):
   def __new__(cls):
     if not hasattr(cls, 'instance'):
-      cls.instance = super(SingletonClass, cls).__new__(cls)
+      cls.instance = super(Singleton, cls).__new__(cls)
     return cls.instance
 
     
@@ -45,5 +45,8 @@ class Catalogue(Singleton):
     def switchuser(self, user):
         self.user = user 
         return self.user
-    
+    def getUser(self):
+        if self.user is None:
+           raise Exception("No user logged in")
+        return self.user
     
