@@ -1,5 +1,5 @@
 import datetime
-from catalogue import Catalogue
+from catalogue.catalogue import Catalogue
 
 class Room:
     def __init__(self, name:str, x, y, capacity:int, workinghours:(datetime.time, datetime.time), permissions:dict):

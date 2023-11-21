@@ -1,14 +1,14 @@
-from room import Room
-from event import Event
+from room.room import Room
+from event.event import event
 class Organization:
-    def __init__(self, name:str, rooms:[Room], events:[Event]):
+    def __init__(self, name:str, rooms:[Room], events:[event]):
         self.id = -1
         self.name = name
         self.rooms = rooms
         self.events = events
     
     @staticmethod
-    def create(name:str, rooms:[Room], events:[Event]):
+    def create(name:str, rooms:[Room], events:[event]):
         organization = Organization(name, rooms, events)
         organization.id = Catalogue().registerOrganization(organization)
         return
@@ -27,7 +27,7 @@ class Organization:
         return
     
     @staticmethod
-    def update(id:int, name:str, rooms:[Room], events:[Event]):
+    def update(id:int, name:str, rooms:[Room], events:[event]):
         organization = Organization(name, rooms, events)
         Catalogue().organizations[id] = organization
         return
