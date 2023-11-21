@@ -7,6 +7,7 @@ class Query:
         self.filter = filter
         self.rooms = rooms
         self.events = events
+
     
     @staticmethod
     def in_rectangle(x:int, y:int, rectangle:((int, int), (int, int))):
@@ -14,10 +15,10 @@ class Query:
     @staticmethod
     def collide(interval1: (datetime.datetime, datetime.datetime), interval2: (datetime.datetime, datetime.datetime)):
         return interval1[0] <= interval2[1] and interval1[1] >= interval2[0]
-        
+     
     def findRoom(self):
         for room in self.rooms:
-            if not Query.in_rectangle(room.x, room.y, self.filter['rectangle']):
+            if not Query.in_rectangle(room.x, room.y, self.filter['rectangle']) or room.capacity < self.filter['event'].capacity:
                 continue
             collision = False
             for event in self.event:

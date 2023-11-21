@@ -1,6 +1,7 @@
 from room.room import Room
 from event.event import Event
 from catalogue.catalogue import Catalogue
+from query.query import Query
 import datetime
 class Organization:
     def __init__(self, name:str, rooms:[Room], events:[Event]):
@@ -34,8 +35,21 @@ class Organization:
         Catalogue().organizations[id] = organization
         return
     
-    def reserve(event:Event, room:Room, start:datetime.datetime):
+    def reserve(self, event:Event, room:Room, start:datetime.datetime):
         event.assignPeriod(start, room)
+        return
+    def reassign(self, event:Event, room:Room, start:datetime.datetime):
+        filter = {
+            "event": event,
+            "start": event.start,
+            "end": event.start+event.duration,
+            "rectangle": ((room.x, room.y), (0,0))
+        }
+        query = Query(filter, [room], self.events)
+        if query.findRoom():
+            event.assignPeriod(start, room)
+            event.location = None
+            event.start = None
         return
 
     def getRoom(self, id:int):

@@ -1,4 +1,4 @@
-from user import User
+from user.user import User
 class Singleton(object):
   def __new__(cls):
     if not hasattr(cls, 'instance'):
