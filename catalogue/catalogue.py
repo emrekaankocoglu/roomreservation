@@ -16,25 +16,25 @@ class Catalogue(Singleton):
     
     def registerRoom(self, room):
         self.id_counter += 1
+        id = self.id_counter
         room_dict = {
-            "id" : self.id_counter,
-            "room" : room
+            id: room
         }
         self.rooms.update(room_dict)
         return self.id_counter
     def registerEvent(self, event):
         self.id_counter += 1
+        id = self.id_counter
         event_dict = {
-            "id" : self.id_counter,
-            "event" : event
+            id : event
         }
         self.events.update(event_dict)
         return self.id_counter
     def registerOrganization(self, organization):
         self.id_counter += 1
+        id = self.id_counter
         organization_dict = {
-            "id" : self.id_counter,
-            "organization" : organization
+            id : organization
         }
         self.organizations.update(organization_dict)
         return self.id_counter
