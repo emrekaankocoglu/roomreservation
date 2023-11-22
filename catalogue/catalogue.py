@@ -1,26 +1,22 @@
 from user.user import User
-class Singleton(object):
-  def __new__(cls):
-    if not hasattr(cls, 'instance'):
-      cls.instance = super(Singleton, cls).__new__(cls)
-    return cls.instance
-  
-def singleton(cls):
-   _instances = {}
-   def getinstance():
-        if cls not in _instances:
-            _instances[cls] = cls() 
-            return _instances[cls]
-   return getinstance
+import json
+class Singleton:
+    def __new__(cls,*a, **b):
+        if hasattr(cls,'_inst'):
+            return cls._inst
+        else:
+            cls._inst=super().__new__(cls,*a,**b)
+            return cls._inst
 
-@singleton   
-class Catalogue:
+class Catalogue(Singleton):
     def __init__(self):
-        self.id_counter = 0
-        self.rooms = {}
-        self.events = {}
-        self.organizations = {}
-        self.user = None
+        if not hasattr(self, 'id_counter'):
+            self.id_counter = 0
+            self.rooms = {}
+            self.events = {}
+            self.organizations = {}
+            self.user = None
+
     
     def registerRoom(self, room):
         self.id_counter += 1
@@ -46,6 +42,31 @@ class Catalogue:
         }
         self.organizations.update(organization_dict)
         return self.id_counter
+    
+    def listobject(self):
+        return [{"id": k, "name": v.name} for k,v in Catalogue().rooms.items()] + \
+        [{"id": k, "name": v.title} for k,v in Catalogue().events.items()] + \
+        [{"id": k, "name": v.name} for k,v in Catalogue().organizations.items()]
+    
+    def getid(self, id):
+        if id in self.rooms:
+            return self.rooms[id]
+        elif id in self.events:
+            return self.events[id]
+        elif id in self.organizations:
+            return self.organizations[id]
+        else:
+            raise Exception("Object not found")
+        
+    def attach(self, id):
+        if id in self.rooms:
+            return self.rooms[id]
+        elif id in self.events:
+            return self.events[id]
+        else:
+            raise Exception("Object not found")
+    def detach(self, id):
+        pass # not required for this phase
     
     def registerUser(self, user):
         self.user = user

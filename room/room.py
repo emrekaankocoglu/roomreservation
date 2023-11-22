@@ -1,7 +1,8 @@
 import datetime
 from catalogue.catalogue import Catalogue
+from catalogue.object import Object
 
-class Room:
+class Room(Object):
     def __init__(self, name:str, x, y, capacity:int, workinghours:(datetime.time, datetime.time), permissions:dict):
         self.id = -1
         self.name = name
@@ -28,11 +29,16 @@ class Room:
     @staticmethod
     def delete(id:int):
         del Catalogue().rooms[id]
+        for id, event in Catalogue().events.items():
+            if event.location == id:
+                event.location = None
+                event.start = None
         return
     
-    @staticmethod
-    def update(id:int, name:str, x, y, capacity:int, workinghours:(datetime.time, datetime.time), permissions:dict):
-        room = Room(name, x, y, capacity, workinghours, permissions)
-        Catalogue().rooms[id] = room
-        return room
+    def update(self, **kwargs):
+        for key, value in kwargs.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
+        return self
     
