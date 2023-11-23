@@ -112,12 +112,14 @@ def main():
     deleteEvent(b.id)
     
     #methods on organization
+    
     org = Organization.create(user2.id,"IEEE",None,{},{})
     print(org)
     org.registerRoom(a)
     org.registerEvent(b)
     print(org)
-    org.reserve(b,a,datetime.now()+timedelta(days=3)) 
+    org.reassign(b,a,datetime.now()+timedelta(days=1))
+     
     org.findSchedule([v for v in org.events.values()], ((0,0), (100,100)), datetime.now(), datetime.now()+timedelta(days=2))
     
     """
