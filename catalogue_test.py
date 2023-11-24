@@ -39,13 +39,7 @@ class TestCatalogue(unittest.TestCase):
         event = Event.create(title, description, category, capacity, duration, weekly, permissions)
         event_id = self.catalogue.registerEvent(event)
         self.assertEqual(self.catalogue.events[event_id].title, "Sample Event")
-    """
-    def test_registerOrganization(self):
-        user2 = User(2,"Alice", "y@gmail.com", "Alice denis", "2345")
-        org = Organization.create(user2.id,"IEEE",None,{},{})
-        org_id = self.catalogue.registerOrganization(Organization("Org1"))
-        self.assertEqual(self.catalogue.organizations[org_id].name, "Org1")
-    """
+    
     def test_listobject(self):
 
         title = "Sample Event"

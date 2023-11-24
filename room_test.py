@@ -54,37 +54,7 @@ class TestRoom(unittest.TestCase):
         updated_room = room.update(name="New Room", capacity=30)
         self.assertEqual(updated_room.name, "New Room")
         self.assertEqual(updated_room.capacity, 30)
-    """
-    def test_delete_room(self):
-        title = "Sample Event"
-        description = "This is a sample event description."
-        category = "Workshop"
-        capacity = 50
-        duration = timedelta(hours=2, minutes=30) 
-        weekly = datetime.now() + timedelta(days=14)
-        permissions = {
-            User: ["PERWRITE", "WRITE"]
-        }
-
-        name = "Sample Location"
-        x = 30 
-        y = 40  
-        capacity = 100
-        working_hours = (time(0, 0), time(17, 0))
-        permissions = {
-            User: ["PERWRITE", "WRITE"]
-        }
-        
-        room = Room.create(name,x,y, capacity, working_hours, permissions)
-        event = Event.create(title, description, category, capacity, duration, weekly, permissions)
-        event.assignPeriod(datetime.now(), room)
-
-        Room.delete(room.id)
-
-        self.assertNotIn(room.id, self.catalogue.rooms)
-        self.assertIsNone(event.location)
-        self.assertIsNone(event.start)
-        """
+   
 
 if __name__ == "__main__":
     unittest.main()
