@@ -6,6 +6,7 @@ from user.user import User
 from datetime import datetime, timedelta
 from datetime import time
 from view.view import View
+import sqlite3
 
 
 """
@@ -63,28 +64,57 @@ def createUser():
     user = User.createUser("x","y","z","w","s",)
     return user
 
+def createUser2():
+    user = User.createUser(2,"y","z","w","s",)
+    return user
+
 def switchUser():
     pass
 
 def main():
     cat = Catalogue()
+    try:
+        User.createtable()
+    except sqlite3.OperationalError:
+        pass
     user = createUser()
-    cat.switchuser(user)
-    a = createRoom(user.id)
-    b = createEvent(user.id)
-    c = Organization.create(user.id,"IEEE",None,{},{})
+
+    user_emre = User.createUser(3,"emre","e@e.com","emre kocoglu","emre")
+    user_furkan = User.createUser(4,"furkan","f@f.com","fba","furkan")
+    user_noone = User.createUser(5,"noone","n@n.com","no one","noone")
+    user_emre.makeAdmin()
+    user_furkan.makeAdmin()
+
+    a = createRoom(user.username)
+    b = createEvent(user.username)
+    permissions = {
+        "noone" : ["listEvent", "listRoom", "createRoom", "createEvent"],
+    }
+    c = Organization.create(user.username,"IEEE",None,{},{},permissions)
     c.registerRoom(a)
     c.registerEvent(b)
-    c.reserve(b,a,datetime.now())
-    b = createEvent(user.id)
+    try:
+        user2 = createUser2()
+        c.reserve(b,a,datetime.now()
+                  )
+    except Exception as e:
+        print("failed: ", e)
+    # print("assigned event:", c.reserve(b,a,datetime.now(), user.username))
+    b = createEvent(user.
+                    id)
+    
     a = createRoom(user.id)
     b = createEvent(user.id)
     c.registerRoom(a)
     c.registerEvent(b)
-    c.reserve(b,a,datetime.now()+timedelta(days=1))
-    c.findSchedule([v for v in c.events.values()], ((0,0), (100,100)), datetime.now(), datetime.now()+timedelta(days=2))
+    print("assign another")
+    # print(c.reserve(b,a,datetime.now()+timedelta(days=7), user.username))
+    print("find schedule")
+    print(c.findSchedule([v for v in c.events.values()], ((0,0), (100,100)), datetime.now(), datetime.now()+timedelta(days=2)))
     n=c.findScheduleInterval([v for v in c.events.values()], ((0,0), (100,100)), datetime.now(), datetime.now()+timedelta(minutes=350), timedelta(minutes=30))
-    user.view = View(user.id)
+    print("find schedule interval")
+    print(n)
+    user.view = View(user.username)
     query_filter = {
         "title" : "S",
         "category" : "Workshop",
@@ -92,10 +122,13 @@ def main():
         "end": datetime.now()+timedelta(days=2),
         "rectangle": ((0,0),(100,100))
     }
+    print("user view")
     user.view.addquery(c.id, **query_filter)
-    user.view.dayView(datetime.now(), datetime.now()+timedelta(days=2))
-    user.view.roomView(datetime.now(), datetime.now()+timedelta(days=2))
+    print(user.view.dayView(datetime.now()-timedelta(days=1), datetime.now()+timedelta(days=2)))
+    print(user.view.roomView(datetime.now()-timedelta(days=1), datetime.now()+timedelta(days=2)))
     user.view.delquery(1)
+    print(user.view)
+    return cat
 
 if __name__=="__main__": 
     main() 

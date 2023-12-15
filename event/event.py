@@ -5,6 +5,7 @@ import datetime
 
 class Event(Object):
     def __init__(self, title:str, description:str, category:str, capacity:int, duration:datetime.timedelta, weekly:datetime.datetime, permissions:dict):
+        super().__init__()
         self.id = -1
         self.title = title
         self.description = description
@@ -32,17 +33,20 @@ class Event(Object):
         del Catalogue().events[id]
         return
     
+    @Object.critical
+    @Object.notify
     def update(self, **kwargs):
         for key, value in kwargs.items():
             if hasattr(self, key):
                 setattr(self, key, value)
         return self
     
-    def assignPeriod(self, start:datetime.datetime, location:Room):
-        eventperms = self.permissions.get(Catalogue().getUser().id)
+    def assignPeriod(self, start:datetime.datetime, location:Room, user:str):
+        eventperms = self.permissions.get(user)
         if eventperms is None:
             raise Exception("User does not have permission to assign event")
-        roomperms = location.permissions.get(Catalogue().getUser().id)
+        roomperms = location.permissions.get(user)
+        print(roomperms)
         if roomperms is None:
             raise Exception("User does not have permission to assign room")
         if self.weekly and "PERWRITE" not in roomperms:

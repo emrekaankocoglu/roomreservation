@@ -1,4 +1,4 @@
-from user.user import User
+from catalogue.object import Object
 import json
 class Singleton:
     def __new__(cls,*a, **b):
@@ -8,16 +8,18 @@ class Singleton:
             cls._inst=super().__new__(cls,*a,**b)
             return cls._inst
 
-class Catalogue(Singleton):
+class Catalogue(Singleton, Object):
     def __init__(self):
+        Object.__init__(self)
         if not hasattr(self, 'id_counter'):
             self.id_counter = 0
             self.rooms = {}
             self.events = {}
             self.organizations = {}
+            self.users = {}
             self.user = None
 
-    
+    @Object.critical
     def registerRoom(self, room):
         self.id_counter += 1
         id = self.id_counter
@@ -26,6 +28,8 @@ class Catalogue(Singleton):
         }
         self.rooms.update(room_dict)
         return self.id_counter
+    
+    @Object.critical
     def registerEvent(self, event):
         self.id_counter += 1
         id = self.id_counter
@@ -34,6 +38,8 @@ class Catalogue(Singleton):
         }
         self.events.update(event_dict)
         return self.id_counter
+    
+    @Object.critical
     def registerOrganization(self, organization):
         self.id_counter += 1
         id = self.id_counter
@@ -63,19 +69,30 @@ class Catalogue(Singleton):
             return self.rooms[id]
         elif id in self.events:
             return self.events[id]
+        elif id in self.organizations:
+            return self.organizations[id]
         else:
             raise Exception("Object not found")
+        
     def detach(self, id):
         pass # not required for this phase
     
+    @Object.critical
     def registerUser(self, user):
-        self.user = user
-        return self.user
-    def switchuser(self, user):
-        self.user = user 
-        return self.user
-    def getUser(self):
-        if self.user is None:
-           raise Exception("No user logged in")
-        return self.user
+        self.id_counter += 1
+        id = self.id_counter
+        user_dict = {
+            id : user
+        }
+        self.users.update(user_dict)
+        return self.id_counter
+    
+    def getUser(self, username):
+        for id, user in self.users.items():
+            if user.username == username:
+                return user
+        return None
+    
+        
+
     

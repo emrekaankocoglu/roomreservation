@@ -4,6 +4,7 @@ from catalogue.object import Object
 
 class Room(Object):
     def __init__(self, name:str, x, y, capacity:int, workinghours:(datetime.time, datetime.time), permissions:dict):
+        super().__init__()
         self.id = -1
         self.name = name
         self.x = x
@@ -35,6 +36,8 @@ class Room(Object):
                 event.start = None
         return
     
+    @Object.critical
+    @Object.notify
     def update(self, **kwargs):
         for key, value in kwargs.items():
             if hasattr(self, key):

@@ -7,6 +7,7 @@ import copy
 
 class Query(Object):
     def __init__(self, filter:dict, rooms:{}, events:{}):
+        super().__init__()
         self.filter = filter
         self.rooms = rooms
         self.events = events

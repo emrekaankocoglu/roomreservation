@@ -4,6 +4,7 @@ from query.query import Query
 
 class View(Object):
     def __init__(self, owner:id):
+        Object.__init__(self)
         self.owner = owner
         self.queryset = {}
         self.obj_count = 0
@@ -14,8 +15,10 @@ class View(Object):
             id: (kwargs, organization)
         }
         self.queryset.update(obj_dict)
+        return self.queryset[id]
     def delquery(self, qid):
         del self.queryset[qid]
+        return qid
     def roomView(self, start, end):
         queries = [Query(v[0], Catalogue().organizations[v[1]].rooms, Catalogue().organizations[v[1]].events) for k,v in self.queryset.items()]
         results = []

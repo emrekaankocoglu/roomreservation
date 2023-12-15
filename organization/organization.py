@@ -7,15 +7,33 @@ import datetime
 import os
 
 class Organization(Object):
-    def __init__(self, owner:int, name:str, map:str, rooms:dict, events:dict):
+    def __init__(self, owner:str, name:str, map:str, rooms:dict, events:dict, permissions:dict):
+        Object.__init__(self)
         self.id = -1
         self.owner = owner
         self.map = map
         self.name = name
         self.rooms = rooms
         self.events = events
+        self.permissions = permissions
 
+    def check_permission(self, action:str, user:str, obj):
+        if user == self.owner:
+            return True
+        if Catalogue().getUser(user).is_admin:
+            return True
+        if action in self.permissions.get(user):
+            if action in ["deleteRoom", "deleteEvent", "updateRoom", "updateEvent"]:
+                if obj.permissions.get(user) is not None and "WRITE" in obj.permissions.get(user):
+                    return True
+                else:
+                    raise Exception("User does not have object level permission to perform action")
+            else:
+                return True
+        raise Exception("User does not have permission to perform action")
 
+    @Object.notify
+    @Object.critical
     def registerRoom(self, room):
         room_dict = {
             room.id: room
@@ -23,6 +41,8 @@ class Organization(Object):
         self.rooms.update(room_dict)
         return room
     
+    @Object.notify
+    @Object.critical
     def registerEvent(self, event):
         event_dict = {
             event.id : event
@@ -31,8 +51,8 @@ class Organization(Object):
         return event
     
     @staticmethod
-    def create(owner:int, name:str, map:str, rooms:dict, events:dict):
-        organization = Organization(owner, name, map, rooms, events)
+    def create(owner:int, name:str, map:str, rooms:dict, events:dict, permissions:dict):
+        organization = Organization(owner, name, map, rooms, events, permissions)
         organization.id = Catalogue().registerOrganization(organization)
         return organization
     
@@ -44,11 +64,13 @@ class Organization(Object):
     def retrieve(id:int):
         return Organization.get(id)
     
+
     @staticmethod
     def delete(id:int):
         del Catalogue().organizations[id]
         return
     
+
     @staticmethod
     def update(id, **kwargs):
         org = Catalogue().organizations[id]
@@ -57,7 +79,9 @@ class Organization(Object):
                 setattr(org, key, value)
         return
     
-    def reserve(self, event:Event, room:Room, start:datetime.datetime):
+    @Object.notify
+    @Object.critical
+    def reserve(self, event:Event, room:Room, start:datetime.datetime, username:str):
         if event.location is not None:
             raise Exception("Event already assigned")
         filter = {
@@ -68,10 +92,13 @@ class Organization(Object):
         }
         query = Query(filter, {room.id : room}, self.events)
         for x in query.findRoom():
-            event.assignPeriod(start, room)
+            event.assignPeriod(start, room, username)
             return event
         raise Exception("Reservation failed: room not available")
-    def reassign(self, event:Event, room:Room, start:datetime.datetime):
+    
+    @Object.notify
+    @Object.critical
+    def reassign(self, event:Event, room:Room, start:datetime.datetime, username:str):
         filter = {
             "event": event,
             "start": start,
@@ -80,9 +107,10 @@ class Organization(Object):
         }
         query = Query(filter, {room.id: room}, self.events)
         for x in query.findRoom():
-            event.assignPeriod(start, room)
+            event.assignPeriod(start, room, username)
             return event
         raise Exception("Reservation failed: room not available")
+    
     def query(self, rectangle:((int,int),(int,int)), title:str, category:str, room:Room):
         filter = {
             "title": title,
@@ -92,6 +120,7 @@ class Organization(Object):
         }
         query = Query(filter, self.rooms, self.events)
         return query.queryIterator()
+
     def findRoom(self, event, rectangle:((int,int),(int,int)), start:datetime.datetime, end:datetime.datetime):
         filter = {
             "event": event,
@@ -125,14 +154,45 @@ class Organization(Object):
     def getRoom(self, id:int):
         return self.rooms[id]
     
+    @Object.notify
+    @Object.critical
     def updateRoom(self, id:int, updates:dict):
         room = self.rooms[id]
         room.update(**updates)
         return 
     
+    @Object.notify
+    @Object.critical
     def deleteRoom(self, id:int):
         del self.rooms[id]
         Room.delete(id)
         return
+    
+    def createRoom(self, name:str, x:int, y:int, capacity:int, workinghours:(datetime.time, datetime.time), permissions:dict):
+        room = Room.create(name, x, y, capacity, workinghours, permissions)
+        self.registerRoom(room)
+        return room
+    
+    def getEvent(self, id:int):
+        return self.events[id]
+    
+    @Object.notify
+    @Object.critical
+    def updateEvent(self, id:int, updates:dict):
+        event = self.events[id]
+        event.update(**updates)
+        return
+    
+    @Object.notify
+    @Object.critical
+    def deleteEvent(self, id:int):
+        del self.events[id]
+        Event.delete(id)
+        return
+    
+    def createEvent(self, title:str, description:str, category:str, capacity:int, duration:datetime.timedelta, weekly:datetime.datetime, permissions:dict):
+        event = Event.create(title, description, category, capacity, duration, weekly, permissions)
+        self.registerEvent(event)
+        return event
     
 
