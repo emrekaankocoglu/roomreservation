@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Room Reservation</title>
+
+</head>
+
+<body>
+    <h1>Room Reservation</h1>
+    <h3>User:{{user}}</h3>
+    <h2>Day View</h2>
+    {% if form %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+    {% endif %}
+    {% if view %}
+    {% for key, value in view.items %}
+    <h3>{{key}}</h3>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Capacity</th>
+            <th>Duration</th>
+            <th>Start Time</th>
+            <th>Weekly</th>
+            <th>Location</th>
+        </tr>
+        {% for entry in value %}
+        <tr>
+            <td>{{ entry.event.id }}</td>
+            <td>{{ entry.event.title }}</td>
+            <td>{{ entry.event.description }}</td>
+            <td>{{ entry.event.category }}</td>
+            <td>{{ entry.event.capacity }}</td>
+            <td>{{ entry.event.duration }}</td>
+            <td>{{ entry.event.start }}</td>
+            <td>{{ entry.event.weekly }}</td>
+            <td>{{ entry.event.location }}</td>
+        </tr>
+        {% endfor %}
+        <svg height="200" width="200">
+            <defs>
+                <pattern id="smallGrid" width="8" height="8" patternUnits="userSpaceOnUse">
+                  <path d="M 8 0 L 0 0 0 8" fill="none" stroke="gray" stroke-width="0.5"/>
+                </pattern>
+                <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
+                  <rect width="80" height="80" fill="url(#smallGrid)"/>
+                  <path d="M 80 0 L 0 0 0 80" fill="none" stroke="gray" stroke-width="1"/>
+                </pattern>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grid)" />
+        {% for entry in value %}
+        <text x="{{entry.room.x}}" y="{{entry.room.y}}" font-size="10px">{{entry.room.name}}</text>
+        <circle cx="{{entry.room.x}}" cy="{{entry.room.y}}" r="5" fill="green"/>
+        {% endfor %}
+        </svg>
+</svg> 
+    </table>
+    {% endfor %}
+    {% endif %}
+
+</body>
+</html>

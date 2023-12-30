@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Room Reservation</title>
+</head>
+<body>
+    <h1>Room Reservation</h1>
+    <h4>User:{{user}}</h4>
+    <h3>Organization {{organization_id}}</h3>
+    <h2>Query List</h2>
+    <table>
+        <tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Rectangle</th>
+        </tr>
+        {% for query in queries %}
+        <tr>
+            <td>{{ query.title }}</td>
+            <td>{{ query.category }}</td>
+            <td>{{ query.start }}</td>
+            <td>{{ query.end }}</td>
+            <td>{{ query.rectangle }}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+</body>
+</html>
+
+

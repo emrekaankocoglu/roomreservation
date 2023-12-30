@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Room Reservation</title>
+</head>
+
+<body>
+    <h1>Room Reservation</h1>
+    <h3>Organization {{organization_id}}</h3>
+    <h2>Delete Room</h2>
+    <!-- <form action="/roomreservation/createroom" method="post">
+        <label for="name">Name:</label>
+        <input type="text" name="name" id="name" required><br>
+        <label for="capacity">Capacity:</label>
+        <input type="number" name="capacity" id="capacity" required><br>
+        <label for="x">Location X:</label>
+        <input type="number" name="x" id="x" required><br>
+        <label for="y">Location Y:</label>
+        <input type="number" name="y" id="y" required><br>
+        <label for="workinghours">Working Hours:</label>
+        <input type="text" name="workinghours" id="workinghours" required><br>
+        <input type="submit" value="Create">
+    </form> -->
+    Are you sure you want to delete room {{room_id}}?
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Submit</button>
+    </form>
+</body>

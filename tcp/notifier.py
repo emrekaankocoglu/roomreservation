@@ -23,13 +23,14 @@ class TCPNotifier(Thread):
                 if self.item is not None:
                     packet = Packet("NOTIFY", {"command": "attach", "response": self.item})
                     Packet.send(self.socket, packet)
-            elif self.view_type is not None and view.queryset:
+            elif self.view_type is not None:
                 view = self.user.view
-                if view is not None and view.queryset:
-                    for k,v in view.queryset.items():
-                        with Catalogue().getid(v[1]).updated:
-                            Catalogue().getid(v[1]).updated.wait()
-                        self.checkupdate()
+                if view.queryset:
+                    if view is not None and view.queryset:
+                        for k,v in view.queryset.items():
+                            with Catalogue().getid(v[1]).updated:
+                                Catalogue().getid(v[1]).updated.wait()
+                            self.checkupdate()
             else:
                 print("Detached notifier")
                 return

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Room Reservation</title>
+
+</head>
+
+<body>
+    <h1>Room Reservation</h1>
+    <h3>User:{{user}}</h3>
+    <h2>Room View</h2>
+    {% if form %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+    {% endif %}
+    {% if view %}
+    {% for key, value in view.items %}
+    <h3>{{key}}</h3>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Capacity</th>
+            <th>Duration</th>
+            <th>Start Time</th>
+            <th>Weekly</th>
+            <th>Location</th>
+        </tr>
+        {% for event in value %}
+        <tr>
+            <td>{{ event.id }}</td>
+            <td>{{ event.title }}</td>
+            <td>{{ event.description }}</td>
+            <td>{{ event.category }}</td>
+            <td>{{ event.capacity }}</td>
+            <td>{{ event.duration }}</td>
+            <td>{{ event.start }}</td>
+            <td>{{ event.weekly }}</td>
+            <td>{{ event.location }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endfor %}
+    {% endif %}
+
+</body>
+</html>

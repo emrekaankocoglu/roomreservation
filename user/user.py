@@ -3,6 +3,9 @@ from catalogue.object import Object
 from view.view import View
 import hashlib
 import sqlite3
+import os
+
+TOKEN = os.environ.get("TOKEN")
 class User(Object):
     def __init__(self, id, username, mail, fullname):
         Object.__init__(self)
@@ -34,6 +37,15 @@ class User(Object):
         if hashlib.sha256(password.encode()).hexdigest() == row[1]:
             return Catalogue().getUser(user)
         raise Exception("Invalid login, check credentials and retry")
+    
+    @staticmethod
+    def loginWithToken(username, token):
+        if token == TOKEN:
+            with sqlite3.connect('auth.sql3') as db:
+                c = db.cursor()
+                query = c.execute('select username from auth where username=?',(username,))
+                row = query.fetchone()
+            return Catalogue().getUser(username)
     
     @staticmethod
     def adduser(user,password):

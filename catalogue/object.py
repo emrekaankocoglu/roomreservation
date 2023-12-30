@@ -38,6 +38,11 @@ class Object:
         del d["lock"]
         del d["updated"]
         return self.__class__.__name__ + ": " + str(d)
+    def getdict(self):
+        d = self.__dict__.copy()
+        del d["lock"]
+        del d["updated"]
+        return d
     def __getstate__(self):
         state = self.__dict__.copy()
         del state["lock"]

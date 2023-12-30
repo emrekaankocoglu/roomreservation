@@ -22,11 +22,13 @@ class TCPInterface:
         self.notifiers = []
     def command_handler(self, packet):
         try:
-            user = User.login(packet.auth["username"], packet.auth["password"])
+            if packet.auth.get("password"):
+                user = User.login(packet.auth["username"], packet.auth["password"])
+            elif packet.auth["token"]:
+                user = User.loginWithToken(packet.auth["username"], packet.auth["token"])
             print(f"User {user.username} logged in")
 
             organization = Catalogue().getid(packet.data["organization"]) if "organization" in packet.data else None
-
 
 
             if packet.data["command"] == "listObject":
@@ -56,7 +58,7 @@ class TCPInterface:
                 obj = organization.createEvent(**packet.data["event"])
             elif packet.data["command"] == "updateEvent":
                 organization.check_permission(packet.data["command"], user.username, organization.getEvent(packet.data["event"]["id"]))
-                obj = organization.updateEvent(**packet.data["event"])
+                obj = organization.updateEvent(packet.data["event"]["id"],packet.data["event"])
             elif packet.data["command"] == "deleteEvent":
                 organization.check_permission(packet.data["command"], user.username, organization.getEvent(packet.data["event"]["id"]))
                 obj = organization.deleteEvent(packet.data["event"]["id"])

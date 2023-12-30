@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Room Reservation</title>
+</head>
+<body>
+    <h1>Room Reservation</h1>
+    <h2>Object List</h2>
+    <ul>
+        {% for object in objects %}
+            <li>{{ object.id }}, {{object.name}}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

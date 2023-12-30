@@ -10,10 +10,15 @@ class TCPReciever(Thread):
     
     def run(self):
         while True:
-            message = self.socket.recv(HEADER_SIZE)
-            if message:
-                message_size = int(message.decode().strip())
-                while len(message) < message_size + HEADER_SIZE:
-                    message += self.socket.recv(16)
-                packet = Packet.decode(message)
-            self.callback(packet)
+            try:
+                message = self.socket.recv(HEADER_SIZE)
+                if message:
+                    message_size = int(message.decode().strip())
+                    while len(message) < message_size + HEADER_SIZE:
+                        message += self.socket.recv(16)
+                    packet = Packet.decode(message)
+                self.callback(packet)
+            except BrokenPipeError:
+                print("Connection closed by client")
+                self.socket.close()
+                return
