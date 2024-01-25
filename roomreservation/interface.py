@@ -9,7 +9,7 @@ class TCPInterfaceInstance:
 
     def __enter__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect(("localhost", 5000))
+        self.socket.connect(("localhost", 8002))
         return self
     def __exit__(self, type, value, traceback):
         self.socket.close()

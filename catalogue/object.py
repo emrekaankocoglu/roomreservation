@@ -1,5 +1,6 @@
 from threading import Lock, Condition
 import pickle
+import json
 
 class Object:
     def __init__(self):
@@ -32,7 +33,7 @@ class Object:
         d = self.__dict__.copy()
         del d["lock"]
         del d["updated"]
-        return self.__class__.__name__ + ": " + str(d)
+        return str(d)
     def __repr__(self) -> str:
         d = self.__dict__.copy()
         del d["lock"]
@@ -52,4 +53,8 @@ class Object:
         self.__dict__.update(state)
         self.lock = Lock()
         self.updated = Condition()
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, 
+            sort_keys=True, indent=4)
     

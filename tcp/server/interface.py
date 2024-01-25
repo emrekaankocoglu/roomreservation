@@ -1,6 +1,6 @@
-from tcp.packet import Packet
-from tcp.reciever import TCPReciever
-from tcp.notifier import TCPNotifier
+from tcp.packet import Packet, WSPacket, serialize
+from tcp.reciever import TCPReciever, WSReciever
+from tcp.notifier import TCPNotifier, WSNotifier
 from catalogue.catalogue import Catalogue
 from event.event import Event
 from room.room import Room
@@ -8,8 +8,9 @@ from user.user import User
 from organization.organization import Organization
 from view.view import View
 from threading import Thread
+from datetime import datetime, date
+import json
 import traceback
-
 
 
 
@@ -126,6 +127,136 @@ class TCPInterface:
         self.socket.close()
 
         print("Interface closed")
+
+
+class WSInterface:
+    def __init__(self, socket):
+        print("WSInterface created")
+        self.socket = socket
+        self.notifiers = []
+    def command_handler(self, packet):
+        try:
+            if packet.auth.get("password"):
+                user = User.login(packet.auth["username"], packet.auth["password"])
+            elif packet.auth["token"]:
+                user = User.loginWithToken(packet.auth["username"], packet.auth["token"])
+            print(f"User {user.username} logged in")
+
+            organization = Catalogue().getid(packet.data["organization"]) if "organization" in packet.data else None
+
+
+            if packet.data["command"] == "listObject":
+                if user.is_admin:
+                    obj = Catalogue().listobject()
+                else:    
+                    raise Exception("Not authorized")
+                
+            elif packet.data["command"] == "listRoom":
+                organization.check_permission(packet.data["command"], user.username, None)
+                obj = organization.rooms
+            elif packet.data["command"] == "createRoom":
+                organization.check_permission(packet.data["command"], user.username, None)
+                obj = organization.createRoom(**packet.data["room"])
+            elif packet.data["command"] == "updateRoom":
+                organization.check_permission(packet.data["command"], user.username, organization.getRoom(packet.data["room"]["id"]))
+                obj = organization.updateRoom(packet.data["room"]["id"],packet.data["room"])
+            elif packet.data["command"] == "deleteRoom":
+                organization.check_permission(packet.data["command"], user.username, organization.getRoom(packet.data["room"]["id"]))
+                obj = organization.deleteRoom(packet.data["room"]["id"])
+
+            elif packet.data["command"] == "listEvent":
+                organization.check_permission(packet.data["command"], user.username, None)
+                obj = organization.events
+            elif packet.data["command"] == "createEvent":
+                organization.check_permission(packet.data["command"], user.username, None)
+                obj = organization.createEvent(**packet.data["event"])
+            elif packet.data["command"] == "updateEvent":
+                organization.check_permission(packet.data["command"], user.username, organization.getEvent(packet.data["event"]["id"]))
+                obj = organization.updateEvent(packet.data["event"]["id"],packet.data["event"])
+            elif packet.data["command"] == "deleteEvent":
+                organization.check_permission(packet.data["command"], user.username, organization.getEvent(packet.data["event"]["id"]))
+                obj = organization.deleteEvent(packet.data["event"]["id"])
+            
+            elif packet.data["command"] == "reserve":
+                organization.check_permission(packet.data["command"], user.username, None)
+                event = organization.getEvent(packet.data["event"]["id"])
+                room = organization.getRoom(packet.data["room"]["id"])
+                obj = organization.reserve(event, room, packet.data["start"], user.username)
+            
+            elif packet.data["command"] == "findSchedule":
+                eventlist = [organization.getEvent(id) for id in packet.data["eventlist"]]
+                obj = organization.findSchedule(eventlist, packet.data["rectangle"], packet.data["start"], packet.data["end"])
+            elif packet.data["command"] == "findScheduleInterval":
+                eventlist = [organization.getEvent(id) for id in packet.data["eventlist"]]
+                obj = organization.findScheduleInterval(eventlist, packet.data["rectangle"], packet.data["start"], packet.data["end"], packet.data["interval"])
+
+            elif packet.data["command"] == "addQuery":
+                obj = user.view.addquery(organization.id, **packet.data["query"])
+            elif packet.data["command"] == "delQuery":
+                obj = user.view.delquery(packet.data["query"]["id"])
+            elif packet.data["command"] == "listQuery":
+                obj = user.view.queryset
+
+            elif packet.data["command"] == "roomView":
+                start = datetime.fromisoformat(packet.data["start"])
+                end = datetime.fromisoformat(packet.data["end"])
+                obj = user.view.roomView(start, end)
+                thread = WSNotifier(self.socket, user=user, view_type="roomView", start_time=start, end_time=end, view_result=json.dumps(obj, default=serialize))
+                thread.start()
+                self.notifiers.append(thread)
+            elif packet.data["command"] == "dayView":
+                start = datetime.fromisoformat(packet.data["start"])
+                end = datetime.fromisoformat(packet.data["end"])
+                obj = user.view.dayView(start, end)
+                n = {}
+                for k,v in obj.items():
+                    if isinstance(k, date):
+                        n[k.isoformat()] = v
+                obj = n
+                thread = WSNotifier(self.socket, user=user, view_type="dayView", start_time=start, end_time=end, view_result=json.dumps(obj, default=serialize))
+                thread.start()
+                self.notifiers.append(thread)
+            
+            elif packet.data["command"] == "attach":
+                obj = Catalogue().getid(packet.data["id"])
+                thread = WSNotifier(self.socket, item=obj)
+                thread.start()
+                self.notifiers.append(thread)
+
+            elif packet.data["command"] == "detach":
+                obj = Catalogue().getid(packet.data["id"])
+                for thread in self.notifiers:
+                    if thread.item == obj:
+                        thread.item = None
+                        break
+            else:
+                raise Exception("Command not found")
+
+            response = WSPacket("OK", {"command": packet.data["command"], "response": obj}, packet.auth)
+            WSPacket.send(self.socket, response)
+        except Exception as e:
+            # send error message
+            response = WSPacket("ERROR", {"command": packet.data["command"], "response": str(e)}, packet.auth)
+            WSPacket.send(self.socket, response)
+            traceback.print_exc()
+        print("response sent")
+        return
+    
+    def close(self):
+        for thread in self.notifiers:
+            thread.item = None
+            thread.view_type = None
+        self.socket.close()
+
+        print("Interface closed")
+
+
+        
+
+
+        
+
+
 
 
         

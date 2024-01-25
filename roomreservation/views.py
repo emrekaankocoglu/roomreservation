@@ -225,7 +225,7 @@ def roomView(request, organization_id):
                 return render(request, "roomview.html", {"view": view, "user": user})
         else:
             form = ViewForm()
-        return render(request, "roomview.html", {"form":form,"organization_id":organization_id, "user": user})
+        return render(request, "roomview.html", {"form":form,"organization_id":organization_id, "user": user, "token": TOKEN })
 
 @login_required(login_url='/login/')
 def dayView(request, organization_id):
@@ -243,7 +243,7 @@ def dayView(request, organization_id):
                 return render(request, "dayview.html", {"view": view, "user": user})
         else:
             form = ViewForm()
-        return render(request, "dayview.html", {"form":form,"organization_id":organization_id, "user": user})
+        return render(request, "dayview.html", {"form":form,"organization_id":organization_id, "user": user, "token": TOKEN})
 
 @login_required(login_url='/login/')
 def listEvent(request, organization_id):

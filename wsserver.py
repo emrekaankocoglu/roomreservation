@@ -8,7 +8,7 @@ from catalogue.object import Object
 from main import main
 from websockets.sync import server
 from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
-import threading
+
 # args should be host and port
 parser = ArgumentParser()
 parser.add_argument("host", help="Host")
@@ -16,35 +16,12 @@ parser.add_argument("port", help="Port")
 args = parser.parse_args()
 
 # start listening to the socket
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((args.host, int(args.port)+1))
-s.listen()
+# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# s.bind((args.host, int(args.port)))
+# s.listen()
 # cat = main()
 interfaces = []
 cat = Object.load("Catalogue.pickle")
-
-def tcpstart():
-    while True:
-        try:
-            # accept a connection
-            conn, addr = s.accept()
-            print("Connection from", addr)
-
-            # run the interface thread
-            interface = TCPInterface(conn)
-            interfaces.append(interface)
-
-        except:
-            for interface in interfaces:
-                interface.close()
-            s.close()
-            cat.save()
-            break
-
-tcp = threading.Thread(target=tcpstart)
-tcp.start()
-
-    
 def start(sock):
     print("Connection from", sock.remote_address)
     while True:
